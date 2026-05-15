@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLE APP PRO</title>
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#f4f4f4;
+}
+
+.start{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:20px;
+}
+
+.start button{
+  padding:14px 28px;
+  border:none;
+  border-radius:12px;
+  background:#3d7a52;
+  color:white;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+
+.app{
+  display:none;
+}
+
+.header{
+  background:#3d7a52;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-size:1.4rem;
+}
+
+.menu{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin:15px 0;
+}
+
+.menu button{
+  padding:10px 16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.screen{
+  display:none;
+  padding:20px;
+}
+
+.active{
+  display:block;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  margin:10px 0;
+}
+
+.vocab button{
+  margin:5px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:#eee;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.hud{
+  text-align:center;
+  margin:10px;
+  font-weight:bold;
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- START -->
+<div id="start" class="start">
+  <h1>🎮 FLE App PRO</h1>
+  <button onclick="startApp()">Comença</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="app">
+
+  <div class="header">
+    <span id="themeTitle"></span>
+  </div>
+
+  <div class="hud">
+    XP: <span id="xp">0</span> | Nivell: <span id="level">1</span>
+  </div>
+
+  <div class="menu">
+    <button onclick="switchTheme('corps')">Cos</button>
+    <button onclick="switchTheme('famille')">Família</button>
+    <button onclick="switchTheme('physique')">Descripció</button>
+  </div>
+
+  <div class="screen active" id="screen">
+    <div class="card">
+      <p id="intro"></p>
+    </div>
+
+    <div class="card">
+      <h3>Vocabulari</h3>
+      <div class="vocab" id="vocab"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+// =======================
+// 🎯 TEMES (DADES)
+// =======================
+
+const THEMES = {
+
+  corps:{
+    name:"Parts del cos",
+    intro:"Aprèn el vocabulari del cos.",
+    vocab:["la tête","le nez","les yeux","la bouche","le bras"]
+  },
+
+  famille:{
+    name:"La famille",
+    intro:"Parla de la teva família.",
+    vocab:["le père","la mère","le frère","la sœur","les parents"]
+  },
+
+  physique:{
+    name:"Description physique",
+    intro:"Descriu una persona.",
+    vocab:["grand","petit","mince","les yeux","les cheveux"]
+  }
+};
+
+// =======================
+// 🧠 ESTAT GLOBAL
+// =======================
+
+let state = {
+  currentTheme:"corps",
+  xp:0,
+  level:1
+};
+
+// =======================
+// 🚀 START
+// =======================
+
+function startApp(){
+  document.getElementById("start").style.display="none";
+  document.getElementById("app").style.display="block";
+  loadTheme("corps");
+}
+
+// =======================
+// 🔄 MOTOR
+// =======================
+
+function switchTheme(theme){
+  loadTheme(theme);
+}
+
+function loadTheme(theme){
+  state.currentTheme = theme;
+  const data = THEMES[theme];
+
+  document.getElementById("themeTitle").textContent = data.name;
+  document.getElementById("intro").textContent = data.intro;
+
+  renderVocab(data.vocab);
+}
+
+// =======================
+// 📚 VOCAB INTERACTIU
+// =======================
+
+function renderVocab(list){
+  const container = document.getElementById("vocab");
+  container.innerHTML = "";
+
+  list.forEach(word=>{
+    const btn = document.createElement("button");
+    btn.textContent = word;
+
+    btn.onclick = ()=>{
+      speak(word);
+      gainXP(5);
+      btn.style.background = "#a8cfb8";
+    }
+
+    container.appendChild(btn);
+  });
+}
+
+// =======================
+// 🔊 AUDIO
+// =======================
+
+function speak(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "fr-FR";
+  speechSynthesis.speak(u);
+}
+
+// =======================
+// 🏆 XP + NIVELL
+// =======================
+
+function gainXP(n){
+  state.xp += n;
+
+  if(state.xp >= state.level*50){
+    state.level++;
+    alert("⬆️ Nivell " + state.level);
+  }
+
+  updateHUD();
+}
+
+function updateHUD(){
+  document.getElementById("xp").textContent = state.xp;
+  document.getElementById("level").textContent = state.level;
+}
+
+// =======================
+// INIT
+// =======================
+updateHUD();
+
+</script>
+
+</body>
+</html>
